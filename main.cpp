@@ -127,13 +127,13 @@ int main()
         }
     }
 
-    std::cout << percolation[0][10] << percolation[10][10] << '\n';
+    //std::cout << percolation[0][10] << percolation[10][10] << '\n';
 
 
     for(int i=0; i<objects_quantity; i++){
         
         corpuscle e; 
-        e.init(5, 5, -1, Vector2f(RandomFloat(20, 80), RandomFloat(520, 580)), Vector2f(RandomFloat(-max_speed, max_speed), RandomFloat(-max_speed, max_speed)), Color::Blue);
+        e.init(5, 5, -1, Vector2f(RandomFloat(20, 80), RandomFloat(520, 580)), Vector2f(RandomFloat(-max_speed, max_speed), RandomFloat(-max_speed, max_speed)), Color(35,137,218));
         objects[i] = e;     
     } 
 
@@ -148,10 +148,13 @@ int main()
 
         model_window.clear();
 
-        
+        RectangleShape Background(Vector2f(window_size, window_size));
+        Background.setFillColor(Color(179, 179, 179));
+        model_window.draw(Background);
 
         
         for(int i=0; i<objects_quantity; i++){
+            
             
 
             Vector2f old_Position = objects[i].getPosition();
