@@ -8,11 +8,12 @@
 
 using namespace sf;
 
-const float Gravitation_const = 0.1;
+const float Gravitation_const = 0;
 const int window_size = 1000;
-const int objects_quantity = 1000;
+const int objects_quantity = 4000;
 const int splitting = 10;
-const float chance = 0.1;
+const float chance = 0.5;
+const float max_speed = 0.5;
 
 int Box(Vector2f vector){
      
@@ -83,7 +84,7 @@ Vector2f operator* (Vector2f vector, float scalar){
 
 int main()
 {
-    srand(time(0));
+    srand(time(NULL));
     
 
     RenderWindow model_window(VideoMode(window_size, window_size), "Simple model");
@@ -105,22 +106,34 @@ int main()
         horisontal[i] = line;
     }
     
-    bool percolation[objects_quantity][objects_quantity];
+    bool percolation[splitting*splitting][splitting*splitting];
 
-    for(int i = 0; i<objects_quantity; i++){
-        for(int j=0; j < objects_quantity; j++){
-            percolation[i][j] = false;
-            if((i - j == 1 or i - j == -1 or i - j == 11 or i - j == -11) and RandomFloat(0, 1) >= chance){
-                percolation[i][j] == true;
+    for(int i = 0; i<splitting*splitting; i++){
+        for(int j=0; j < splitting*splitting; j++){
+            
+            percolation[i][j] = true;
+            percolation[j][i] = true;
+
+            if (i == j){
+                percolation[i][j] = false;
+                percolation[j][i] = false;  
             }
+            if((i - j == 1 or i - j == -1 or i - j == 10 or i - j == -10) and (RandomFloat(0, 1) <= chance)){
+                percolation[i][j] = false;    
+                percolation[j][i] = false;  
+            }
+            
+            
         }
     }
+
+    std::cout << percolation[0][10] << percolation[10][10] << '\n';
 
 
     for(int i=0; i<objects_quantity; i++){
         
         corpuscle e; 
-        e.init(5, 5, -1, Vector2f(RandomFloat(10, 40), RandomFloat(10, 40)), Vector2f(RandomFloat(-10, 10), RandomFloat(-10, 10)), Color::Blue);
+        e.init(5, 5, -1, Vector2f(RandomFloat(20, 80), RandomFloat(520, 580)), Vector2f(RandomFloat(-max_speed, max_speed), RandomFloat(-max_speed, max_speed)), Color::Blue);
         objects[i] = e;     
     } 
 
@@ -146,21 +159,38 @@ int main()
             Vector2f new_Position = old_Position + objects[i].speed;
 
             int new_box = Box(new_Position);
+            //std::cout << new_box;
             
             if(percolation[objects[i].box][new_box]){
+        
                 new_Position = old_Position;    
 
-                if (objects[i].box - new_box == 1 or objects[i].box - new_box == -1 or objects[i].box - new_box == 10 or objects[i].box - new_box == -10 or objects[i].box - new_box == 12 or objects[i].box - new_box == -12){
+                // if (objects[i].box - new_box == 1 or objects[i].box - new_box == -1 or objects[i].box - new_box == 10 or objects[i].box - new_box == -10 or objects[i].box - new_box == 12 or objects[i].box - new_box == -12){
+                //     objects[i].speed.x = objects[i].speed.x * -1;
+                // } 
+                // if (objects[i].box - new_box == 11 or objects[i].box - new_box == -11 or objects[i].box - new_box == 10 or objects[i].box - new_box == -10 or objects[i].box - new_box == 12 or objects[i].box - new_box == -12){
+                //     objects[i].speed.y = objects[i].speed.y * -1;
+                // }
+
+                if (new_box - objects[i].box == -9 or new_box - objects[i].box == 1 or new_box - objects[i].box == 11){
                     objects[i].speed.x = objects[i].speed.x * -1;
+                    //new_Position.x = (new_box % splitting) * (window_size / splitting);
                 } 
-                if (objects[i].box - new_box == 11 or objects[i].box - new_box == -11 or objects[i].box - new_box == 10 or objects[i].box - new_box == -10 or objects[i].box - new_box == 12 or objects[i].box - new_box == -12){
+                if (new_box - objects[i].box == -11 or new_box - objects[i].box == -1 or new_box - objects[i].box == 9){
+                    objects[i].speed.x = objects[i].speed.x * -1;
+                    //new_Position.x = (objects[i].box % splitting) * (window_size / splitting);
+                } 
+                if (new_box - objects[i].box == -11 or new_box - objects[i].box == -10 or new_box - objects[i].box == -9){
                     objects[i].speed.y = objects[i].speed.y * -1;
+                    //new_Position.y = (objects[i].box / splitting) * (window_size / splitting);
+                } 
+                if (new_box - objects[i].box == 9 or new_box - objects[i].box == 10 or new_box - objects[i].box == 11){
+                    objects[i].speed.y = objects[i].speed.y * -1;
+                    //new_Position.y = (new_box / splitting) * (window_size / splitting);
                 } 
 
             }        
             
-            objects[i].setPosition(new_Position);            
-
             if (new_Position.x >= window_size)
             {
                 new_Position.x = window_size;
@@ -181,6 +211,8 @@ int main()
                 new_Position.y = 0;
                 objects[i].speed.y = objects[i].speed.y * -1;
             }
+
+            objects[i].setPosition(new_Position); 
 
             model_window.draw(objects[i].shape);
         }
