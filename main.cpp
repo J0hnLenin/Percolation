@@ -10,10 +10,11 @@ using namespace sf;
 
 const float Gravitation_const = 0;
 const int window_size = 1000;
-const int objects_quantity = 4000;
-const int splitting = 10;
+const int objects_quantity = 5000;
+const int splitting = 25;
 const float chance = 0.5;
-const float max_speed = 0.5;
+const float max_speed = 1;
+const float deltha = 1;
 
 int Box(Vector2f vector){
      
@@ -89,6 +90,9 @@ int main()
 
     RenderWindow model_window(VideoMode(window_size, window_size), "Simple model");
     
+    RectangleShape background(Vector2f(window_size, window_size));
+    background.setFillColor(Color(179, 179, 179));
+
     corpuscle objects[objects_quantity];
 
     RectangleShape vertical[splitting];
@@ -118,7 +122,7 @@ int main()
                 percolation[i][j] = false;
                 percolation[j][i] = false;  
             }
-            if((i - j == 1 or i - j == -1 or i - j == 10 or i - j == -10) and (RandomFloat(0, 1) <= chance)){
+            if((i - j == 1 or i - j == -1 or i - j == splitting or i - j == -splitting) and (RandomFloat(0, 1) <= chance)){
                 percolation[i][j] = false;    
                 percolation[j][i] = false;  
             }
@@ -127,13 +131,13 @@ int main()
         }
     }
 
-    //std::cout << percolation[0][10] << percolation[10][10] << '\n';
+    std::cout << percolation[0][10] << percolation[10][10] << '\n';
 
 
     for(int i=0; i<objects_quantity; i++){
         
         corpuscle e; 
-        e.init(5, 5, -1, Vector2f(RandomFloat(20, 80), RandomFloat(520, 580)), Vector2f(RandomFloat(-max_speed, max_speed), RandomFloat(-max_speed, max_speed)), Color(35,137,218));
+        e.init(5, 5, -1, Vector2f(RandomFloat(deltha, window_size / splitting - deltha), RandomFloat(window_size / 2 + deltha, window_size * (splitting + 2) / (2 * splitting) - deltha)), Vector2f(RandomFloat(-max_speed, max_speed), RandomFloat(-max_speed, max_speed)), Color(27, 127, 218));
         objects[i] = e;     
     } 
 
@@ -148,13 +152,10 @@ int main()
 
         model_window.clear();
 
-        RectangleShape Background(Vector2f(window_size, window_size));
-        Background.setFillColor(Color(179, 179, 179));
-        model_window.draw(Background);
+        model_window.draw(background);
 
         
         for(int i=0; i<objects_quantity; i++){
-            
             
 
             Vector2f old_Position = objects[i].getPosition();
@@ -175,22 +176,22 @@ int main()
                 //     objects[i].speed.y = objects[i].speed.y * -1;
                 // }
 
-                if (new_box - objects[i].box == -9 or new_box - objects[i].box == 1 or new_box - objects[i].box == 11){
+                if (new_box - objects[i].box == -(splitting - 1) or new_box - objects[i].box == 1 or new_box - objects[i].box == splitting + 1){
                     objects[i].speed.x = objects[i].speed.x * -1;
                     //new_Position.x = (new_box % splitting) * (window_size / splitting);
                 } 
-                if (new_box - objects[i].box == -11 or new_box - objects[i].box == -1 or new_box - objects[i].box == 9){
+                if (new_box - objects[i].box == -(splitting + 1) or new_box - objects[i].box == -1 or new_box - objects[i].box == (splitting - 1)){
                     objects[i].speed.x = objects[i].speed.x * -1;
                     //new_Position.x = (objects[i].box % splitting) * (window_size / splitting);
                 } 
-                if (new_box - objects[i].box == -11 or new_box - objects[i].box == -10 or new_box - objects[i].box == -9){
+                if (new_box - objects[i].box == -(splitting + 1) or new_box - objects[i].box == -splitting or new_box - objects[i].box == -(splitting - 1)){
                     objects[i].speed.y = objects[i].speed.y * -1;
                     //new_Position.y = (objects[i].box / splitting) * (window_size / splitting);
                 } 
-                if (new_box - objects[i].box == 9 or new_box - objects[i].box == 10 or new_box - objects[i].box == 11){
+                if (new_box - objects[i].box == (splitting - 1) or new_box - objects[i].box == splitting or new_box - objects[i].box == (splitting + 1)){
                     objects[i].speed.y = objects[i].speed.y * -1;
                     //new_Position.y = (new_box / splitting) * (window_size / splitting);
-                } 
+                }
 
             }        
             
@@ -227,10 +228,6 @@ int main()
         
         model_window.display();
 
-        
-
-        RectangleShape horisontal(Vector2f(2, window_size - 100));
-        horisontal.setPosition(Vector2f(50, 50));
         
     }
 
