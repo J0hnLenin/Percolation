@@ -131,9 +131,6 @@ int main()
         }
     }
 
-    std::cout << percolation[0][10] << percolation[10][10] << '\n';
-
-
     for(int i=0; i<objects_quantity; i++){
         
         corpuscle e; 
